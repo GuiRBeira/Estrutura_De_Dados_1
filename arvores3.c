@@ -174,12 +174,10 @@ int altura_arvore(no_simples *raiz){
 
     //retorna a maior altura mais 1
     int c = raiz->chave;
-    int alt_esq = altura_arvore(???);
-    int alt_dir ???
+    int alt_esq = altura_arvore(raiz->esquerda);
+    int alt_dir = altura_arvore(raiz->direita)
 
-    ????
-
-    return ???
+    return (alt_esq > alt_dir)? alt_esq : alt_dir;
 }
 
 
