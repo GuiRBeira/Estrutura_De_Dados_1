@@ -91,7 +91,8 @@ int buscaElemento(TabelaHash *c, int id){
     if(c->cardapio[posicao].id == id) return posicao;
     int i = 0;
     do{
-        ++posicao; posicao%=SIZE;
+        ++posicao;
+        posicao%=SIZE;
         if(c->cardapio[posicao].id == id) return posicao;
         else if (c->cardapio[posicao].id == -1) return -1;
         i++;

@@ -1,72 +1,65 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <stdbool.h>
+#define N_MAX 5
 
-// tipo do nó (cada elemento) da fila dinâmica
-typedef struct NodeQueue NodeQueue;
-
-struct NodeQueue{
-    int key;                  // um dado qqr
-    NodeQueue *next;   // ponteiro para o próximo elemento
-};
-
-// tipo fila dinâmica:
 typedef struct{
-    NodeQueue *begin;         // inicio da fila
-    NodeQueue *last;        // fim da fila
-    int size;            // numero de elementos da fila
-} DinamicQueue;
+    char name[16];
+    double price;
+} Product;
 
-void append(int a, DinamicQueue *queue){
-    NodeQueue *element = (NodeQueue *)malloc(sizeof(NodeQueue));
-    if(element == NULL){
-        write(1, "Erro ao alocar memória", 24);
-        exit(1);
-    }
-    //preencher elemento
-    element->key = a;
-    element->next = NULL;
+typedef struct{
+    Product array[N_MAX];
+    int start;
+    int end;
+    int size;
+} ProductList;
 
-    //fila vazia
-    if(queue->size == 0){
-        queue->begin = element;
-        queue->last = element;
-    } else {
-        NodeQueue *aux = queue->last;
-        aux->next = element;
-        queue->last = element; 
+bool append(Product p, ProductList *pl){
+    if(pl->size >= N_MAX){
+        printf("Fila cheia.");
+        return false;
     }
-    queue->size++;
+    pl->array[pl->end] = p;
+    pl->end = (pl->end + 1) % N_MAX;
+    pl->size++;
+    return true;
 }
 
-void remover(int *x, DinamicQueue *queue){
-    if(queue->size == 0){
-        write(1, "A fila ta vazia", 16);
-        return;
+void show_queue(ProductList *pl){
+    printf("\nFila:\n");
+    Product prod;
+    int j = 0;
+    for(int i = pl->start; j <pl->size; i = (i+1)%N_MAX){
+        prod = pl->array[i];
+        printf("\nproduto: %s\nR$: %.2f", prod.name, prod.price);
+        j++;
     }
-    //criar um nó auxiliar
-    NodeQueue *aux = queue->begin;
-    //copiar o valor de retorno
-    *x = aux->key;
-    //atualizar o ponteiro "begin"
+}
 
-    //liberar a memoria do elemento removido
-    queue->begin = aux->next;
-    free(aux);
-    queue->size--;
+bool removeprod(Product *p, ProductList *pl){
+    if(pl->size == 0){
+        printf("Fila vazia.");
+        return false;
+    }
+    *p = pl->array[pl->start];
+    pl->start = (pl->start + 1) % N_MAX;
+    pl->size--;
+    return true;
 }
 
 int main(){
-    DinamicQueue queue = {NULL,NULL,0};
-    append(8, &queue);
-    append(10, &queue);
-    append(12, &queue);
-    append(-1, &queue);
-    append(-5, &queue);
-    int removed;
-    printf("%d\n", queue.begin->key);
-    printf("%d\n", queue.last->key);
-    remover(&removed, &queue);
-    printf("%d\n", queue.size);
+    ProductList prods;
+    prods.start = 0;
+    prods.end = 0;
+    prods.size = 0;
+    Product p1 = {"Esponja", 1.50};
+    Product p2 = {"Escova", 4.50};
+    append(p1, &prods);
+    append(p2, &prods);
+    show_queue(&prods);
+    removeprod(&p1, &prods);
+    show_queue(&prods);
+    removeprod(&p2, &prods);
+    show_queue(&prods);
     return 0;
 }
